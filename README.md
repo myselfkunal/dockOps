@@ -2,48 +2,57 @@
 **Containerized Python APIs with Docker Compose + GitHub Actions CI**
 
 ## 📌 Overview
-This project demonstrates how to containerize **three small Python FastAPI microservices**, connect them using **Docker Compose**, and apply **basic DevOps practices** like Git, automated testing, CI/CD with GitHub Actions, and simple monitoring/logging.  
+**dockOps** is a hands-on DevOps project that demonstrates how to design, containerize, and connect multiple backend microservices using Docker and Docker Compose, with automated validation using GitHub Actions CI.
 
-It is designed as a **beginner-friendly introduction** to Cloud + DevOps concepts in a local environment.
-
+The project is intentionally kept simple while following **real-world DevOps practices**, making it ideal for learning and showcasing cloud-native fundamentals.
 ---
 
 ## 🧩 Architecture
 
-**Services:**
-1. **Auth Service (`auth`)**
-   - Provides dummy tokens for users.
-   - Endpoint: `/token` → returns `token-<user_id>`.
+The system consists of **three independent FastAPI microservices**:
 
-2. **Products Service (`products`)**
-   - Stores a small static product list.
-   - Endpoints: `/products`, `/products/{id}`.
+### 🔐 Auth Service
+- Generates and validates user tokens
+- Endpoints:
+  - `GET /token?user_id=<id>`
+  - `GET /validate?token=<token>`
 
-3. **Orders Service (`orders`)**
-   - Creates orders by:
-     - Validating token with `auth`.
-     - Fetching product details from `products`.
-   - Endpoint: `/orders`.
+### 📦 Products Service
+- Stores a static list of products
+- Endpoints:
+  - `GET /products`
+  - `GET /products/{id}`
 
-**Communication:**  
-- Services talk to each other via internal Docker Compose networking.  
-- `orders` → `auth` (for tokens)  
-- `orders` → `products` (for product info)  
+### 🧾 Orders Service
+- Creates orders by:
+  - Validating tokens via Auth service
+  - Fetching product details via Products service
+- Endpoint:
+  - `POST /orders`
+
+### 🔗 Service Communication
+Services communicate over an internal Docker network:
+
+- `orders → auth`
+- `orders → products`
 
 ---
 
 ## 🛠️ Tech Stack
-- **Python 3.11** + [FastAPI](https://fastapi.tiangolo.com/)  
-- **Docker** + **Docker Compose**  
-- **GitHub Actions** (CI: tests + builds)  
-- **Pytest** (unit testing)  
+
+- **Python 3.11**
+- **FastAPI**
+- **Docker & Docker Compose**
+- **Git & GitHub**
+- **GitHub Actions (CI)**
+- **HTTPX (service-to-service communication)**
 
 ---
 
 ## 📂 Project Structure
 ```
 
-project-root/
+dockOps/
 ├─ auth/
 │  ├─ app.py
 │  ├─ requirements.txt
@@ -61,14 +70,20 @@ project-root/
 
 ````
 
+
 ---
 
 ## 🚀 Getting Started
 
-### 1. Clone the repo
+### Prerequisites
+- Docker
+- Docker Compose
+
+### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/Dking08/dockOps-GFG_Cloud-I.git
-cd mini-cloud-devops
+git clone https://github.com/myselfkunal/dockOps.git
+cd dockOps
+
 ````
 
 ### 2. Build & start all services
@@ -79,75 +94,54 @@ docker-compose up --build
 
 ### 3. Test the services
 
-* Check health:
+* Generate token:
 
   ```bash
-  curl http://localhost:8001/health
-  curl http://localhost:8002/health
-  curl http://localhost:8003/health
-  ```
-
-* Get token:
-
-  ```bash
-  curl -X POST http://localhost:8001/token \
-       -H "Content-Type: application/json" \
-       -d '{"user_id": 1}'
+  curl "http://localhost:8000/token?user_id=kunal"
   ```
 
 * Get products:
 
   ```bash
-  curl http://localhost:8002/products
+  curl http://localhost:8001/products
   ```
 
-* Create order:
+* Create an order:
 
   ```bash
-  curl -X POST http://localhost:8003/orders \
-       -H "Content-Type: application/json" \
-       -d '{"token":"token-1","product_id":1,"qty":2}'
+ curl -X POST http://localhost:8002/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "<PASTE_TOKEN_HERE>",
+    "product_id": 1
+  }'
   ```
-
----
-
-## ✅ Testing
-
-Each service includes a tiny [pytest](https://docs.pytest.org/) test.
-Run tests locally:
-
-```bash
-cd auth && pytest
-cd products && pytest
-cd orders && pytest
-```
 
 ---
 
 ## ⚙️ Continuous Integration (CI)
 
-* CI runs on **GitHub Actions**.
-* On every `push` or `pull_request`, it:
+* This project uses **GitHub Actions** to automatically validate the system.
+* On every `push` or `pull_request`, the CI pipeline:
 
-  1. Installs dependencies.
-  2. Runs unit tests for each service.
-  3. Builds Docker images (optional push step).
+  1. Builds Docker images.
+  2. Starts all services using Docker Compose.
+  3. Runs smoke tests against live containers.
+  4. Fails fast if any service is broken. 
 
 Workflow file: `.github/workflows/ci.yml`
 
 ---
 
-## 📊 Monitoring & Logging
+## 📈 What This Project Demonstrates
 
-* Logs:
+   1. Microservices architecture basics
+   2. Containerization with Docker
+   3. Service-to-service communication
+   4. Token-based authentication
+   5. Docker Compose orchestration
+   6. CI pipelines using GitHub Actions
+   7. Clean Git branching and workflow practices
 
-  ```bash
-  docker-compose logs -f orders
-  ```
-* Health endpoints:
-
-  * `GET /health` for each service.
-
-(*Optional: extend with Prometheus + Grafana later.*)
 
 ---
