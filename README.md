@@ -109,7 +109,7 @@ docker-compose up --build
 * Create an order:
 
   ```bash
- curl -X POST http://localhost:8002/orders \
+  curl -X POST http://localhost:8002/orders \
   -H "Content-Type: application/json" \
   -d '{
     "token": "<PASTE_TOKEN_HERE>",
