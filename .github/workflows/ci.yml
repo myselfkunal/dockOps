@@ -1,0 +1,38 @@
+name: DockOps CI
+
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  pull_request:
+
+jobs:
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker images
+        run: docker-compose build
+
+      - name: Run containers
+        run: docker-compose up -d
+
+      - name: Wait for services
+        run: sleep 10
+
+      - name: Smoke test Auth service
+        run: curl -f http://localhost:8000/token?user_id=ci-test
+
+      - name: Smoke test Products service
+        run: curl -f http://localhost:8001/products
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose down
