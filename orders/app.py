@@ -5,8 +5,8 @@ import httpx
 
 app = FastAPI()
 
-AUTH_SERVICE_URL = "http://127.0.0.1:8000"
-PRODUCT_SERVICE_URL = "http://127.0.0.1:8001"
+AUTH_SERVICE_URL = "http://auth:8000"
+PRODUCT_SERVICE_URL = "http://products:8001"
 
 class Order(BaseModel):
     token: str

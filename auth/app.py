@@ -4,7 +4,7 @@ from pathlib import Path
 
 app = FastAPI()
 
-TOKEN_FILE = Path("auth/tokens.txt")
+TOKEN_FILE = Path("tokens.txt")
 
 def save_token(token: str):
     with TOKEN_FILE.open("a") as f:
